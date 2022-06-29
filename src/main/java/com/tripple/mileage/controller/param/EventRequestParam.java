@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class EventRequestParam {
     private String reviewId;
     private String content;
     private List<String> attachedPhotoIds;
+    @NotNull
     private String userId;
     private String placeId;
 
