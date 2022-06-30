@@ -14,13 +14,17 @@ import java.util.List;
 @Getter
 public class EventRequestParam {
 
+    @NotNull
     private EventType type;
+    @NotNull
     private EventActionType action;
+    @NotNull
     private String reviewId;
     private String content;
     private List<String> attachedPhotoIds;
     @NotNull
     private String userId;
+    @NotNull
     private String placeId;
 
 }

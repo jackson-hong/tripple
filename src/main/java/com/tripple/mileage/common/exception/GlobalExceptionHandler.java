@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MileException.class)
-    public ResponseEntity<ResponseData<ErrorPayload>> labException(MileException e){
-        log.error("LabException: {}", e.getMessage());
+    public ResponseEntity<ResponseData<ErrorPayload>> mileException(MileException e){
+        log.error("MileException: {}", e.getMessage());
         ErrorPayload errorPayload = ErrorPayload.builder()
                 .message(e.getResultCode().getResultMessage())
                 .build();

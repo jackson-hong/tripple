@@ -9,12 +9,18 @@ public enum ResultCode {
     RESULT_9999("9999","실패"),
 
     // USER
-    RESULT_4001("4001", "알 수 없는 유저입니다."),
+    RESULT_4001("4001", "알 수 없는 유저입니다.", HttpStatus.UNAUTHORIZED),
     RESULT_4003("4003","권한이 유효하지 않습니다", HttpStatus.UNAUTHORIZED),
 
-    // Valid
+    // PLACE
+    RESULT_4101("4101", "유효하지 않은 장소입니다", HttpStatus.BAD_REQUEST),
+
+    // Validation
+    RESULT_4201("4201", "유효하지 않은 요청입니다.", HttpStatus.BAD_REQUEST),
+
+    // Internal Validation
     RESULT_5001("5001", "유효하지 않은 파라미터입니다."),
-    RESULT_5002("5002","해당 엔티티가 존재하지 않습니다.")
+    RESULT_5002("5002","해당 엔티티가 존재하지 않습니다."),
 ;
 
 
