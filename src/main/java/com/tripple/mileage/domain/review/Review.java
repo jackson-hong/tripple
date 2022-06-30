@@ -4,10 +4,18 @@ import com.tripple.mileage.common.type.YnType;
 import com.tripple.mileage.domain.BaseEntity;
 import com.tripple.mileage.domain.place.Place;
 import com.tripple.mileage.domain.user.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "review_mst")
+@Getter
+@AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class Review extends BaseEntity {
 
     @Id
@@ -18,7 +26,7 @@ public class Review extends BaseEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private YnType useYn;
+    private YnType useYn = YnType.Y;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "placeId")
