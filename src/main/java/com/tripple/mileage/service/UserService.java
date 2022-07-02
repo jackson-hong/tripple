@@ -20,4 +20,12 @@ public class UserService {
     public Optional<User> findUserByUserId(String userId){
         return userRepository.findById(userId);
     }
+
+    public User findPresentUserByUserId(String userId){
+        return userRepository.findById(userId).orElseThrow(() -> new MileException(ResultCode.RESULT_4001));
+    }
+
+    public void save(User user){
+        userRepository.save(user);
+    }
 }

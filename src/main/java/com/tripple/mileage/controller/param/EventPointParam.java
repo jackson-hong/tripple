@@ -12,18 +12,24 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class EventRequestParam {
+public class EventPointParam {
 
     @NotNull
     private EventType type;
+
     @NotNull
     private EventActionType action;
+
     @NotNull
     private String reviewId;
+
     private String content;
+
     private List<String> attachedPhotoIds;
+
     @NotNull
     private String userId;
+
     @NotNull
     private String placeId;
 

@@ -1,6 +1,7 @@
 package com.tripple.mileage.domain.review;
 
 import com.tripple.mileage.common.type.YnType;
+import com.tripple.mileage.controller.param.EventPointParam;
 import com.tripple.mileage.domain.BaseEntity;
 import com.tripple.mileage.domain.place.Place;
 import com.tripple.mileage.domain.user.User;
@@ -28,12 +29,21 @@ public class Review extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private YnType useYn = YnType.Y;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "placeId")
     private Place place;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "userId")
     private User user;
+
+    public static Review of(EventPointParam param, Place place, User user){
+        return Review.builder()
+                .reviewId(param.getReviewId())
+                .content(param.getContent())
+                .place(place)
+                .user(user)
+                .build();
+    }
 
 }

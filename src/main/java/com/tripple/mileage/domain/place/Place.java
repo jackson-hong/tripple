@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "place_mst")
@@ -21,5 +22,9 @@ public class Place extends BaseEntity {
     private String placeId;
 
     @OneToMany(mappedBy = "place", fetch = FetchType.LAZY)
-    private List<Review> reviews;
+    private final List<Review> reviews = new ArrayList<>();
+
+    public void addReview(Review review){
+        this.reviews.add(review);
+    }
 }

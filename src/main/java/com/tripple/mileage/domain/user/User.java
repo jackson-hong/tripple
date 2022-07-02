@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "user_mst")
@@ -25,5 +26,13 @@ public class User extends BaseEntity {
     private int totalPoint;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Review> reviews;
+    private final List<Review> reviews = new ArrayList<>();
+
+    public void addReview(Review review){
+        this.reviews.add(review);
+    }
+
+    public void adjustPoint(int gapPoint){
+        this.totalPoint += gapPoint;
+    }
 }
