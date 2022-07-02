@@ -20,6 +20,7 @@ public enum ResultCode {
 
     // Review
     RESULT_4301("4301", "이미 존재하는 리뷰입니다.", HttpStatus.BAD_REQUEST),
+    RESULT_4302("4302", "리뷰가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 
     // Internal Validation
     RESULT_5001("5001", "유효하지 않은 파라미터입니다."),

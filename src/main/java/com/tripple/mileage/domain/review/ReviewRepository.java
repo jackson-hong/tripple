@@ -2,5 +2,8 @@ package com.tripple.mileage.domain.review;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewRepository extends JpaRepository<Review, String> {
+import java.util.UUID;
+
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
+
 }

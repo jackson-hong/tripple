@@ -18,18 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
 @Slf4j
 @Import({
         PlaceQueryRepository.class,
@@ -53,21 +51,18 @@ class PlaceQueryRepositoryTest {
 
     private ListAppender<ILoggingEvent> listAppender;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
     @BeforeEach
     public void setup() {
         User user = User.builder()
-                .userId("3ede0ef2-92b7-4817-a5f3-0c575361f745")
+                .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
                 .build();
 
         Place place = Place.builder()
-                .placeId("2e4baf1c-5acb-4efb-a1af-eddada31b00f")
+                .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
                 .build();
 
         Review review = Review.builder()
-                .reviewId("240a0658-dc5f-4878-9381-ebb7b2667772")
+                .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
                 .content("Good!")
                 .user(user)
                 .place(place)
@@ -88,10 +83,9 @@ class PlaceQueryRepositoryTest {
 
     @Test
     @DisplayName("N+1 문제 발생 여부 테스트")
-    @Transactional
     void testGetPlaceIfUnnecessaryQuery(){
         // GIVEN
-        String placeId = "2e4baf1c-5acb-4efb-a1af-eddada31b00f";
+        UUID placeId = UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f");
 
         // WHEN
         Place result = placeQueryRepository.findPlaceWithReviews(placeId);

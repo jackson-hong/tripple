@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Builder
@@ -21,16 +22,16 @@ public class EventPointParam {
     private EventActionType action;
 
     @NotNull
-    private String reviewId;
+    private UUID reviewId;
 
     private String content;
 
-    private List<String> attachedPhotoIds;
+    private List<UUID> attachedPhotoIds;
 
     @NotNull
-    private String userId;
+    private UUID userId;
 
     @NotNull
-    private String placeId;
+    private UUID placeId;
 
 }

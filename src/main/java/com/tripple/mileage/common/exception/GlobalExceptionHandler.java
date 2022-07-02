@@ -14,11 +14,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ResponseData<ErrorPayload>> unhandledException(Exception e){
-        log.error("unhandled error occurred : {}", e.getMessage());
+        log.warn("unhandled error occurred : {}", e.getMessage());
         ErrorPayload errorPayload = ErrorPayload.builder()
                                     .message("Unhandled Exception")
-                                    .detailMessage(e.getClass().getSimpleName())
-                                    .description(e.getMessage())
                                     .build();
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -27,7 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MileException.class)
     public ResponseEntity<ResponseData<ErrorPayload>> mileException(MileException e){
-        log.error("MileException: {}", e.getMessage());
+        log.warn("MileException: {}", e.getMessage());
         ErrorPayload errorPayload = ErrorPayload.builder()
                 .message(e.getResultCode().getResultMessage())
                 .build();

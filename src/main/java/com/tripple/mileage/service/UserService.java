@@ -9,20 +9,26 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public Optional<User> findUserByUserId(String userId){
+    public Optional<User> findUserByUserId(UUID userId){
         return userRepository.findById(userId);
     }
 
-    public User findPresentUserByUserId(String userId){
+    public User findPresentUserByUserId(UUID userId){
         return userRepository.findById(userId).orElseThrow(() -> new MileException(ResultCode.RESULT_4001));
+    }
+
+    public void adjustPointAndSave(User user, int acquiredPoint){
+        user.plusPoint(acquiredPoint);
+        save(user);
     }
 
     public void save(User user){

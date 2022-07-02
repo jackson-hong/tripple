@@ -7,10 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity(name = "user_mst")
 @Getter
@@ -20,7 +22,8 @@ import java.util.List;
 public class User extends BaseEntity {
 
     @Id
-    private String userId;
+    @Type(type = "uuid-char")
+    private UUID userId;
 
     @Column
     private int totalPoint;
@@ -32,7 +35,7 @@ public class User extends BaseEntity {
         this.reviews.add(review);
     }
 
-    public void adjustPoint(int gapPoint){
+    public void plusPoint(int gapPoint){
         this.totalPoint += gapPoint;
     }
 }

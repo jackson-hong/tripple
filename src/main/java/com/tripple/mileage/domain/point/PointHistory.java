@@ -1,13 +1,16 @@
 package com.tripple.mileage.domain.point;
+
 import com.tripple.mileage.common.type.PointType;
 import com.tripple.mileage.common.type.event.EventActionType;
 import com.tripple.mileage.controller.param.EventPointParam;
 import com.tripple.mileage.domain.BaseEntity;
+import com.tripple.mileage.domain.review.Review;
 import com.tripple.mileage.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -20,7 +23,8 @@ import java.util.UUID;
 public class PointHistory extends BaseEntity {
 
     @Id
-    private String pointHistoryId;
+    @Type(type = "uuid-char")
+    private UUID pointHistoryId;
 
     @Enumerated(EnumType.STRING)
     private PointType pointReasonType;
@@ -35,12 +39,18 @@ public class PointHistory extends BaseEntity {
     @JoinColumn(name = "userId")
     private User user;
 
-    public static PointHistory of(PointType pointReasonType, EventPointParam param, int pointAmount){
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reviewId")
+    private Review review;
+
+    public static PointHistory of(PointType pointReasonType, EventPointParam param, int pointAmount, Review review, User user){
         return PointHistory.builder()
-                .pointHistoryId(UUID.randomUUID().toString())
+                .pointHistoryId(UUID.randomUUID())
                 .actionType(param.getAction())
                 .pointReasonType(pointReasonType)
                 .pointAmount(pointAmount)
+                .review(review)
+                .user(user)
                 .build();
     }
 }
