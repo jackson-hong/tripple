@@ -44,7 +44,7 @@ public class PointService {
     }
 
 
-    public void deleteAllAcquiredPointsByReview(Review review, EventPointParam param) {
+    public void deletePointsByReviewDel(Review review, EventPointParam param) {
         User user = review.getUser();
         int totalAcquiredPointToDelete = calculatePointByReviewDel(review);
         userService.adjustPointAndSave(user, totalAcquiredPointToDelete);
@@ -96,7 +96,7 @@ public class PointService {
 
     // 장소에 첫번째 리뷰일 경우 +1
     private int addPointIfFirstReview(EventPointParam param, Place place) {
-        if(place.getReviews().size() > 0) return 0;
+        if(place.getReviews().size() > 1) return 0;
         int pointAmount = 1;
         savePointHistory(PointType.PLACE_FIRST, param, pointAmount);
         log.info("Point Add : First Review For The Place");

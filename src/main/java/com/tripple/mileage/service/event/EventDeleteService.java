@@ -26,7 +26,7 @@ public class EventDeleteService implements ReviewPointProcessable {
         review.delete();
 
         // 포인트 계산
-        pointService.deleteAllAcquiredPointsByReview(review, param);
+        pointService.deletePointsByReviewDel(review, param);
 
         reviewService.save(review);
     }

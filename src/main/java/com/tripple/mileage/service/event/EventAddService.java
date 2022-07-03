@@ -39,12 +39,11 @@ public class EventAddService implements ReviewPointProcessable {
         User user = userService.findPresentUserByUserId(param.getUserId());
         Review review = Review.of(param, place, user);
         addPhotosToReview(param, review);
-
         reviewService.save(review);
+
         // 포인트 계산
         log.info("Review Add - Calculate Point");
         pointService.acquirePointsByReviewWrite(review, param);
-
     }
 
     private void addPhotosToReview(EventPointParam param, Review review) {

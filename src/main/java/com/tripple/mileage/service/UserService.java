@@ -31,6 +31,10 @@ public class UserService {
         save(user);
     }
 
+    public User findUserWithHistories(UUID userId){
+        return userRepository.findWithHistoriesByUserId(userId);
+    }
+
     public void save(User user){
         userRepository.save(user);
     }

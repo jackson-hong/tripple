@@ -2,6 +2,7 @@ package com.tripple.mileage.domain.user;
 
 
 import com.tripple.mileage.domain.BaseEntity;
+import com.tripple.mileage.domain.point.PointHistory;
 import com.tripple.mileage.domain.review.Review;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@NamedEntityGraph(name = "user-point-history-graph",
+        attributeNodes = {
+                @NamedAttributeNode("pointHistories")
+        })
 public class User extends BaseEntity {
 
     @Id
@@ -30,6 +35,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private final List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final List<PointHistory> pointHistories = new ArrayList<>();
 
     public void addReview(Review review){
         this.reviews.add(review);

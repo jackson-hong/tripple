@@ -4,11 +4,13 @@ package com.tripple.mileage.controller;
 import com.tripple.mileage.common.code.ResultCode;
 import com.tripple.mileage.controller.payload.ErrorPayload;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ResponseData<T> extends ResponseBase {
 
-    private final T resultData;
+    private T resultData;
 
     public ResponseData(ResultCode resultCode) {
         this(resultCode, null);

@@ -1,5 +1,6 @@
 package com.tripple.mileage.controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tripple.mileage.common.code.ResultCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,9 @@ import java.time.format.DateTimeFormatter;
 public class ResponseBase {
 
     private ResultCode resultCode;
+    @JsonFormat(pattern = "yyyyMMddHHmmss")
     private LocalDateTime systemDt;
+    private String resultMessage;
 
     public ResponseBase(ResultCode resultCode){
         this.resultCode = resultCode;

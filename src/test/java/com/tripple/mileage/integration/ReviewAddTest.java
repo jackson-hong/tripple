@@ -167,6 +167,7 @@ public class ReviewAddTest {
 
             List<UUID> attachedPhotoIds = Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
                     (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332")));
+
             EventPointParam setupParam = EventPointParam.builder()
                     .type(REVIEW)
                     .action(ADD)
@@ -182,35 +183,35 @@ public class ReviewAddTest {
             reviewRepository.save(review);
         }
 
-        @Test
-        @DisplayName("사진 O 리뷰 O 최초 리뷰 X 테스트")
-        void testReviewAddWithPhotosNotFirstPhoto() throws Exception {
-            // GIVEN
-            EventPointParam param = EventPointParam.builder()
-                    .type(REVIEW)
-                    .action(ADD)
-                    .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
-                    .content("좋아요!")
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
-                    .attachedPhotoIds(Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
-                            (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332"))))
-                    .build();
-
-            // WHEN
-            mockMvc.perform(post("/events")
-                    .content(objectMapper.writeValueAsString(param))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk());
-
-            User user = userRepository.findById(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745")).get();
-            List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
-
-            // THEN
-            assertThat(user.getTotalPoint()).isEqualTo(2);
-            assertThat(pointHistories.size()).isEqualTo(2);
-        }
+//        @Test
+//        @DisplayName("사진 O 리뷰 O 최초 리뷰 X 테스트")
+//        void testReviewAddWithPhotosNotFirstPhoto() throws Exception {
+//            // GIVEN
+//            EventPointParam param = EventPointParam.builder()
+//                    .type(REVIEW)
+//                    .action(ADD)
+//                    .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
+//                    .content("좋아요!")
+//                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
+//                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
+//                    .attachedPhotoIds(Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
+//                            (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332"))))
+//                    .build();
+//
+//            // WHEN
+//            mockMvc.perform(post("/events")
+//                    .content(objectMapper.writeValueAsString(param))
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .accept(MediaType.APPLICATION_JSON))
+//                    .andDo(print())
+//                    .andExpect(status().isOk());
+//
+//            User user = userRepository.findById(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745")).get();
+//            List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
+//
+//            // THEN
+//            assertThat(user.getTotalPoint()).isEqualTo(2);
+//            assertThat(pointHistories.size()).isEqualTo(2);
+//        }
     }
 }

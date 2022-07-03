@@ -37,4 +37,11 @@ public class ReviewService {
         review.delete();
         save(review);
     }
+
+    public static void main(String[] args) {
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+        System.out.println(UUID.randomUUID());
+    }
 }

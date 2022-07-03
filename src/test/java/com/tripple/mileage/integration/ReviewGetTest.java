@@ -1,10 +1,12 @@
 package com.tripple.mileage.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.tripple.mileage.controller.ResponseData;
 import com.tripple.mileage.controller.param.EventPointParam;
+import com.tripple.mileage.controller.payload.PointHistoryListPayload;
 import com.tripple.mileage.domain.place.Place;
 import com.tripple.mileage.domain.place.PlaceRepository;
-import com.tripple.mileage.domain.point.PointHistory;
 import com.tripple.mileage.domain.point.PointHistoryRepository;
 import com.tripple.mileage.domain.review.ReviewRepository;
 import com.tripple.mileage.domain.user.User;
@@ -17,24 +19,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static com.tripple.mileage.common.type.event.EventActionType.ADD;
-import static com.tripple.mileage.common.type.event.EventActionType.DELETE;
 import static com.tripple.mileage.common.type.event.EventType.REVIEW;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Transactional
 @AutoConfigureMockMvc
-public class ReviewDelTest {
+public class ReviewGetTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -54,11 +55,11 @@ public class ReviewDelTest {
     @Autowired
     PointHistoryRepository pointHistoryRepository;
 
-    private UUID reviewId = UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772");
-    private UUID userId = UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745");
-    private UUID placeId = UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f");
-    private List<UUID> attachedPhotoIds = Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
-            (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332")));
+    private UUID reviewId = UUID.randomUUID();
+    private UUID userId = UUID.randomUUID();
+    private UUID placeId = UUID.randomUUID();
+    private List<UUID> attachedPhotoIds = Arrays.asList(UUID.randomUUID(),
+            UUID.randomUUID());
 
     @BeforeEach
     void setUp() throws Exception {
@@ -87,36 +88,36 @@ public class ReviewDelTest {
                 .content(objectMapper.writeValueAsString(param))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("리뷰 삭제 테스트")
-    void testReviewDelete() throws Exception {
+    @DisplayName("Point History 조회 테스트")
+    void testGetPointHistory() throws Exception {
         // GIVEN
-        EventPointParam param = EventPointParam.builder()
-                .type(REVIEW)
-                .action(DELETE)
-                .reviewId(reviewId)
-                .userId(userId)
-                .placeId(placeId)
-                .build();
+        String userId = this.userId.toString();
 
         // WHEN
-        mockMvc.perform(post("/events")
-                .content(objectMapper.writeValueAsString(param))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(get("/users/"+userId+"/points")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
-                .andExpect(status().isOk());
-
-        User user = userRepository.findById(userId).get();
-        List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
-
+                .andExpect(status().isOk()).andReturn();
+        ResponseData<PointHistoryListPayload> payload = convert(result, ResponseData.class);
+        PointHistoryListPayload finalResult = convert(payload, PointHistoryListPayload.class);
         // THEN
-        assertThat(user.getTotalPoint()).isEqualTo(0);
-        assertThat(pointHistories.size()).isEqualTo(4);
+        assertThat(finalResult.getTotalPointAmount()).isEqualTo(3);
+        assertThat(finalResult.getUserId().toString()).isEqualTo(userId);
+        assertThat(finalResult.getPointHistoryList().size()).isEqualTo(3);
     }
+
+    public <T> T convert(ResponseData result, Class<T> clazz) {
+        return new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(result.getResultData(), clazz);
+    }
+
+    public <T> T convert(MvcResult result, Class<T> clazz) throws Exception {
+        return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(result.getResponse().getContentAsString(), clazz);
+    }
+
 
 }
