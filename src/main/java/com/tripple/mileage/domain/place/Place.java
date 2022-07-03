@@ -30,7 +30,7 @@ public class Place extends BaseEntity {
     @Type(type = "uuid-char")
     private UUID placeId;
 
-    @OneToMany(mappedBy = "place", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "place", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private final List<Review> reviews = new ArrayList<>();
 
     public void addReview(Review review){

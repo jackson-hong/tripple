@@ -32,7 +32,7 @@ public class PointService {
     public void acquirePointsByReviewWrite(Review review, EventPointParam param) {
         Place place = placeService.findPlaceByPlaceIdWithReviews(param.getPlaceId());
         User user = userService.findPresentUserByUserId(param.getUserId());
-        int totalAcquiredPoint = calculatePointByNewReview(review, param, place, user);
+        int totalAcquiredPoint = calculatePointByNewReview(review, param, place);
         userService.adjustPointAndSave(user, totalAcquiredPoint);
     }
 
@@ -68,9 +68,10 @@ public class PointService {
     // 기존 사진이 있는 리뷰에서 사진 삭제시 -1점
     private int minusPointIfPhotoDeleted(EventPointParam eventPointParam, List<Photo> photosOfReview) {
         if(photosOfReview.size() == 0) return 0;
-        if(eventPointParam.getAttachedPhotoIds().size() > 0) return 0;
+        if(!ObjectUtils.isEmpty(eventPointParam.getAttachedPhotoIds()) && eventPointParam.getAttachedPhotoIds().size() > 0) return 0;
         int pointAmount = -1;
         savePointHistory(PointType.PHOTO, eventPointParam, pointAmount);
+        log.info("Point Minus : Photos Removed");
         return pointAmount;
     }
 
@@ -80,14 +81,16 @@ public class PointService {
         if(eventPointParam.getAttachedPhotoIds().size() == 0) return 0;
         int pointAmount = 1;
         savePointHistory(PointType.PHOTO, eventPointParam, pointAmount);
+        log.info("Point Add : New Photos Attached For A Review of None");
         return pointAmount;
     }
 
-    private int calculatePointByNewReview(Review review, EventPointParam param, Place place, User user) {
+    private int calculatePointByNewReview(Review review, EventPointParam param, Place place) {
         int totalAcquiredPoint = 0;
         totalAcquiredPoint += addPointIfContentValid(review, param);
         totalAcquiredPoint += addPointIfPhotoAttached(param);
         totalAcquiredPoint += addPointIfFirstReview(param, place);
+        log.info("Acquired Points : {}", totalAcquiredPoint);
         return totalAcquiredPoint;
     }
 
@@ -96,6 +99,7 @@ public class PointService {
         if(place.getReviews().size() > 0) return 0;
         int pointAmount = 1;
         savePointHistory(PointType.PLACE_FIRST, param, pointAmount);
+        log.info("Point Add : First Review For The Place");
         return pointAmount;
     }
 
@@ -111,6 +115,7 @@ public class PointService {
         if(ObjectUtils.isEmpty(param.getAttachedPhotoIds()) || param.getAttachedPhotoIds().size() == 0) return 0;
         int pointAmount = 1;
         savePointHistory(PointType.PHOTO, param, pointAmount);
+        log.info("Point Add : Review Photo Attached");
         return pointAmount;
     }
 
@@ -118,6 +123,7 @@ public class PointService {
         if(ObjectUtils.isEmpty(param.getContent()) || param.getContent().length() == 0) return 0;
         int pointAmount = 1;
         savePointHistory(PointType.REVIEW, param, pointAmount);
+        log.info("Point Add : Review Content Valid");
         return pointAmount;
     }
 

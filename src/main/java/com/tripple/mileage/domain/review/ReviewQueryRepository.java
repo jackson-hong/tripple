@@ -29,4 +29,10 @@ public class ReviewQueryRepository {
                 .fetchAll().fetchOne();
         return result;
     }
+
+    public Review findReviewWithQuery(UUID reviewId){
+        return jpaQueryFactory.selectFrom(review)
+                .where(review.reviewId.eq(reviewId))
+                .fetchOne();
+    }
 }

@@ -6,7 +6,6 @@ import com.tripple.mileage.domain.place.Place;
 import com.tripple.mileage.domain.place.PlaceRepository;
 import com.tripple.mileage.domain.point.PointHistory;
 import com.tripple.mileage.domain.point.PointHistoryRepository;
-import com.tripple.mileage.domain.review.Review;
 import com.tripple.mileage.domain.review.ReviewRepository;
 import com.tripple.mileage.domain.user.User;
 import com.tripple.mileage.domain.user.UserRepository;
@@ -26,19 +25,20 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.tripple.mileage.common.type.event.EventActionType.ADD;
+import static com.tripple.mileage.common.type.event.EventActionType.MOD;
 import static com.tripple.mileage.common.type.event.EventType.REVIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ReviewAddTest {
+public class ReviewModTest {
 
     @Nested
     @SpringBootTest
     @Transactional
     @AutoConfigureMockMvc
-    public class testAddPointWithoutPreviousReview{
+    public class testModPointWithNoPhoto {
         @Autowired
         MockMvc mockMvc;
 
@@ -57,31 +57,55 @@ public class ReviewAddTest {
         @Autowired
         PointHistoryRepository pointHistoryRepository;
 
+        private UUID reviewId = UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772");
+        private UUID userId = UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745");
+        private UUID placeId = UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f");
+        private List<UUID> attachedPhotoIds = Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
+                (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332")));
+
         @BeforeEach
-        void setUp(){
+        void setUp() throws Exception {
             User user = User.builder()
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
+                    .userId(userId)
                     .build();
 
             Place place = Place.builder()
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
+                    .placeId(placeId)
                     .build();
 
             userRepository.save(user);
             placeRepository.save(place);
-        }
 
-        @Test
-        @DisplayName("사진 X 리뷰 O 최초 리뷰 O 테스트")
-        void testReviewAddWithoutPhotos() throws Exception {
-            // GIVEN
             EventPointParam param = EventPointParam.builder()
                     .type(REVIEW)
                     .action(ADD)
-                    .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
+                    .reviewId(reviewId)
                     .content("좋아요!")
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
+                    .userId(userId)
+                    .placeId(placeId)
+                    .build();
+
+            // WHEN
+            mockMvc.perform(post("/events")
+                    .content(objectMapper.writeValueAsString(param))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("기존 리뷰 사진 추가 테스트")
+        void testReviewModAddPhoto() throws Exception {
+            // GIVEN
+            EventPointParam param = EventPointParam.builder()
+                    .type(REVIEW)
+                    .action(MOD)
+                    .reviewId(reviewId)
+                    .content("좋아요!")
+                    .userId(userId)
+                    .placeId(placeId)
+                    .attachedPhotoIds(attachedPhotoIds)
                     .build();
 
             // WHEN
@@ -92,38 +116,7 @@ public class ReviewAddTest {
                     .andDo(print())
                     .andExpect(status().isOk());
 
-            User user = userRepository.findById(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745")).get();
-            List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
-
-            // THEN
-            assertThat(user.getTotalPoint()).isEqualTo(2);
-            assertThat(pointHistories.size()).isEqualTo(2);
-        }
-
-        @Test
-        @DisplayName("사진 O 리뷰 O 최초 리뷰 O 테스트")
-        void testReviewAddWithPhotos() throws Exception {
-            // GIVEN
-            EventPointParam param = EventPointParam.builder()
-                    .type(REVIEW)
-                    .action(ADD)
-                    .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
-                    .content("좋아요!")
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
-                    .attachedPhotoIds(Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
-                            (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332"))))
-                    .build();
-
-            // WHEN
-            mockMvc.perform(post("/events")
-                    .content(objectMapper.writeValueAsString(param))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk());
-
-            User user = userRepository.findById(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745")).get();
+            User user = userRepository.findById(userId).get();
             List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
 
             // THEN
@@ -136,7 +129,7 @@ public class ReviewAddTest {
     @SpringBootTest
     @Transactional
     @AutoConfigureMockMvc
-    public class testAddPointWithPreviousReview{
+    public class testModPointWithPhoto {
         @Autowired
         MockMvc mockMvc;
 
@@ -155,46 +148,55 @@ public class ReviewAddTest {
         @Autowired
         PointHistoryRepository pointHistoryRepository;
 
+        private UUID reviewId = UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772");
+        private UUID userId = UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745");
+        private UUID placeId = UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f");
+        private List<UUID> attachedPhotoIds = Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
+                (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332")));
+
         @BeforeEach
-        void setUp(){
+        void setUp() throws Exception {
             User user = User.builder()
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
+                    .userId(userId)
                     .build();
 
             Place place = Place.builder()
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
+                    .placeId(placeId)
                     .build();
 
-            List<UUID> attachedPhotoIds = Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
-                    (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332")));
-            EventPointParam setupParam = EventPointParam.builder()
-                    .type(REVIEW)
-                    .action(ADD)
-                    .reviewId(UUID.randomUUID())
-                    .content("좋아요!")
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
-                    .attachedPhotoIds(attachedPhotoIds)
-                    .build();
-            Review review = Review.of(setupParam, place, user);
-            place.addReview(review);
-            user.addReview(review);
-            reviewRepository.save(review);
-        }
+            userRepository.save(user);
+            placeRepository.save(place);
 
-        @Test
-        @DisplayName("사진 O 리뷰 O 최초 리뷰 X 테스트")
-        void testReviewAddWithPhotosNotFirstPhoto() throws Exception {
-            // GIVEN
             EventPointParam param = EventPointParam.builder()
                     .type(REVIEW)
                     .action(ADD)
-                    .reviewId(UUID.fromString("240a0658-dc5f-4878-9381-ebb7b2667772"))
+                    .reviewId(reviewId)
                     .content("좋아요!")
-                    .userId(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745"))
-                    .placeId(UUID.fromString("2e4baf1c-5acb-4efb-a1af-eddada31b00f"))
-                    .attachedPhotoIds(Arrays.asList(UUID.fromString("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8"),
-                            (UUID.fromString("afb0cef2-851d-4a50-bb07-9cc15cbdc332"))))
+                    .userId(userId)
+                    .placeId(placeId)
+                    .attachedPhotoIds(attachedPhotoIds)
+                    .build();
+
+            // WHEN
+            mockMvc.perform(post("/events")
+                    .content(objectMapper.writeValueAsString(param))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("기존 리뷰 사진 삭제 테스트")
+        void testReviewModDeletePhoto() throws Exception {
+            // GIVEN
+            EventPointParam param = EventPointParam.builder()
+                    .type(REVIEW)
+                    .action(MOD)
+                    .reviewId(reviewId)
+                    .content("좋아요!")
+                    .userId(userId)
+                    .placeId(placeId)
                     .build();
 
             // WHEN
@@ -205,12 +207,12 @@ public class ReviewAddTest {
                     .andDo(print())
                     .andExpect(status().isOk());
 
-            User user = userRepository.findById(UUID.fromString("3ede0ef2-92b7-4817-a5f3-0c575361f745")).get();
+            User user = userRepository.findById(userId).get();
             List<PointHistory> pointHistories = pointHistoryRepository.findAllByUser(user);
 
             // THEN
             assertThat(user.getTotalPoint()).isEqualTo(2);
-            assertThat(pointHistories.size()).isEqualTo(2);
+            assertThat(pointHistories.size()).isEqualTo(4);
         }
     }
 }

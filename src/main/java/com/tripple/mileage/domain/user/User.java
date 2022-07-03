@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     @Column
     private int totalPoint;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private final List<Review> reviews = new ArrayList<>();
 
     public void addReview(Review review){

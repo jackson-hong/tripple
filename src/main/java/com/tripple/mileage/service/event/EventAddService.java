@@ -11,12 +11,14 @@ import com.tripple.mileage.service.place.PlaceService;
 import com.tripple.mileage.service.point.PointService;
 import com.tripple.mileage.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EventAddService implements ReviewPointProcessable {
 
@@ -28,10 +30,11 @@ public class EventAddService implements ReviewPointProcessable {
 
     @Override
     public void reviewPointProcess(EventPointParam param) {
-        // Validation
+        log.info("Review Add - Validation Start {}", param.getReviewId());
         validationService.validateDuplicateReview(param.getReviewId());
 
         // 리뷰 생성
+        log.info("Review Add - Build Review");
         Place place = placeService.findPresentPlaceByPlaceId(param.getPlaceId());
         User user = userService.findPresentUserByUserId(param.getUserId());
         Review review = Review.of(param, place, user);
@@ -39,6 +42,7 @@ public class EventAddService implements ReviewPointProcessable {
 
         reviewService.save(review);
         // 포인트 계산
+        log.info("Review Add - Calculate Point");
         pointService.acquirePointsByReviewWrite(review, param);
 
     }

@@ -24,7 +24,7 @@ public class ValidationService {
     public void validateReviewExistWithUserAndPlace(UUID reviewId, UUID userId, UUID placeId){
         Review review = reviewService.findExistReviewWithUserAndPlaceByReviewId(reviewId);
         if(notMatchReviewWithUser(userId, review.getUser().getUserId())) throw new MileException(ResultCode.RESULT_4302);
-        if(notMatchReviewWithPlace(placeId, review)) throw new MileException(ResultCode.RESULT_4302);
+        if(notMatchReviewWithPlace(placeId, review.getPlace().getPlaceId())) throw new MileException(ResultCode.RESULT_4302);
     }
 
     public void validateReviewExist(UUID reviewId){
@@ -40,14 +40,15 @@ public class ValidationService {
     }
 
     public void validateDuplicateReview(UUID reviewId){
+        log.debug("check duplicate review : {}", reviewId.toString());
         reviewService.findReviewByReviewId(reviewId).ifPresent(review -> {throw new MileException(ResultCode.RESULT_4301);});
     }
 
-    private boolean notMatchReviewWithPlace(UUID placeId, Review review) {
-        return review.getPlace().getPlaceId() != placeId;
+    private boolean notMatchReviewWithPlace(UUID placeId, UUID placeIdFromReview) {
+        return !placeId.equals(placeIdFromReview);
     }
 
-    private boolean notMatchReviewWithUser(UUID userId, UUID userId2) {
-        return userId2 != userId;
+    private boolean notMatchReviewWithUser(UUID userId, UUID userIdFromReview) {
+        return !userIdFromReview.equals(userId);
     }
 }

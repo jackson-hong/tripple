@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Getter
 @Builder
 @NoArgsConstructor
+@Where(clause = "use_yn = 'Y'")
 public class Review extends BaseEntity {
 
     @Id

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Photo extends BaseEntity {
     }
 
     public static List<Photo> makePhotoList(List<UUID> photoIds, Review review){
-        if(photoIds.size() == 0) return new ArrayList<>();
+        if(ObjectUtils.isEmpty(photoIds) || photoIds.size() == 0) return new ArrayList<>();
         return photoIds.stream().map(photoId -> of(photoId, review)).collect(Collectors.toList());
     }
 }
