@@ -20,6 +20,7 @@ public class PointHistoryPayload {
     private PointType pointReasonType;
     private EventActionType actionType;
     private int pointAmount;
+    private UUID reviewId;
 
     public static PointHistoryPayload from(PointHistory pointHistory){
         return PointHistoryPayload.builder()
@@ -27,6 +28,7 @@ public class PointHistoryPayload {
                 .pointReasonType(pointHistory.getPointReasonType())
                 .actionType(pointHistory.getActionType())
                 .pointAmount(pointHistory.getPointAmount())
+                .reviewId(pointHistory.getReview().getReviewId())
                 .build();
     }
 }

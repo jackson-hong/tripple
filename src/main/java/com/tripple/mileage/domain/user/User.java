@@ -22,8 +22,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @NamedEntityGraph(name = "user-point-history-graph",
         attributeNodes = {
-                @NamedAttributeNode("pointHistories")
-        })
+                @NamedAttributeNode(value = "pointHistories", subgraph = "point-history-review-sub")
+        },
+        subgraphs = {
+            @NamedSubgraph(name = "point-history-review-sub", attributeNodes = {
+                    @NamedAttributeNode("review")
+            }),
+        }
+)
 public class User extends BaseEntity {
 
     @Id
